@@ -68,16 +68,15 @@ class Bot(BaseBot):
 
 if __name__ == "__main__":
     import os
-    from highrise.__main__ import run
-
-    # Get credentials
-    token = os.getenv("BOT_TOKEN")
-    room_id = os.getenv("ROOM_ID")
+    import asyncio
+    from highrise import __main__
     
-    if not token or not room_id:
-        print("Missing BOT_TOKEN or ROOM_ID")
-        exit(1)
-        
-    # Instead of manual BotDefinition, let run handle the initialization
-    # If this fails with 3 arguments, try removing 'token' here
-    run(Bot(), room_id, token)
+    # We will use the built-in run method directly
+    # This avoids the BotDefinition argument conflict entirely
+    asyncio.run(__main__.main(
+        [
+            "--bot-token", os.getenv("BOT_TOKEN"),
+            "--room-id", os.getenv("ROOM_ID"),
+            "--bot-class", "Bot"
+        ]
+    ))
