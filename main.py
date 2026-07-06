@@ -75,6 +75,8 @@ if __name__ == "__main__":
         logger.error("BOT_TOKEN or ROOM_ID not found in environment variables!")
         exit(1)
         
-    # The SDK specifically requires: BotDefinition(bot_instance, room_id, api_token)
-    bot_def = BotDefinition(Bot(), room_id, token)
-    run([bot_def])
+    # Standard format: BotDefinition(bot_instance, room_id, api_token)
+    definitions = [BotDefinition(Bot(), room_id, token)]
+    
+    # Use the run() function to start the bot
+    run(definitions)
