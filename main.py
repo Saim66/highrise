@@ -66,9 +66,8 @@ class Bot(BaseBot):
     async def on_tip(self, sender, receiver, tip):
         await self.cmd.on_tip(sender, receiver, tip)
 
-# --- CRITICAL FIX: The Runner ---
+# --- UPDATED RUNNER ---
 if __name__ == "__main__":
-    # Ensure these environment variables are set in Railway -> Settings -> Variables
     token = os.getenv("BOT_TOKEN")
     room_id = os.getenv("ROOM_ID")
     
@@ -76,5 +75,9 @@ if __name__ == "__main__":
         logger.error("BOT_TOKEN or ROOM_ID not found in environment variables!")
         exit(1)
         
-    definitions = [BotDefinition(Bot(), room_id, token)]
-    run(definitions)
+    # Attempting a different initialization format
+    definitions = [BotDefinition(Bot(), room_id)] 
+    
+    # If the above fails, try: definitions = [BotDefinition(Bot(), room_id, token)]
+    
+    run(definitions, token)
