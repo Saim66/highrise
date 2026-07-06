@@ -67,20 +67,17 @@ class Bot(BaseBot):
         await self.cmd.on_tip(sender, receiver, tip)
 
 if __name__ == "__main__":
-    from highrise import BaseBot
-    from highrise.__main__ import run
-    from highrise.models import BotDefinition
     import os
+    from highrise.__main__ import run
 
-    # Ensure your environment variables are correctly loaded in Railway
+    # Get credentials
     token = os.getenv("BOT_TOKEN")
     room_id = os.getenv("ROOM_ID")
     
-    # Initialize your Bot class
-    bot = Bot()
-    
-    # Initialize the definition
-    bot_def = BotDefinition(bot, room_id, token)
-    
-    # Run the bot
-    run([bot_def])
+    if not token or not room_id:
+        print("Missing BOT_TOKEN or ROOM_ID")
+        exit(1)
+        
+    # Instead of manual BotDefinition, let run handle the initialization
+    # If this fails with 3 arguments, try removing 'token' here
+    run(Bot(), room_id, token)
