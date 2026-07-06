@@ -66,17 +66,21 @@ class Bot(BaseBot):
     async def on_tip(self, sender, receiver, tip):
         await self.cmd.on_tip(sender, receiver, tip)
 
-# --- FINAL PROVEN FIX ---
 if __name__ == "__main__":
+    from highrise import BaseBot
+    from highrise.__main__ import run
+    from highrise.models import BotDefinition
+    import os
+
+    # Ensure your environment variables are correctly loaded in Railway
     token = os.getenv("BOT_TOKEN")
     room_id = os.getenv("ROOM_ID")
     
-    if not token or not room_id:
-        logger.error("BOT_TOKEN or ROOM_ID not found in environment variables!")
-        exit(1)
-        
-    # Standard format: BotDefinition(bot_instance, room_id, api_token)
-    definitions = [BotDefinition(Bot(), room_id, token)]
+    # Initialize your Bot class
+    bot = Bot()
     
-    # Use the run() function to start the bot
-    run(definitions)
+    # Initialize the definition
+    bot_def = BotDefinition(bot, room_id, token)
+    
+    # Run the bot
+    run([bot_def])
