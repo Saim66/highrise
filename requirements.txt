@@ -21,7 +21,7 @@ itsdangerous
 Jinja2
 MarkupSafe
 multidict
-pendulum==2.1.2
+pendulum>=3.0.0
 pm2
 propcache
 python-dateutil
