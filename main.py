@@ -1,6 +1,7 @@
 import os
-from highrise import BaseBot
-from highrise.__main__ import run
+import asyncio
+from highrise import BaseBot, Highrise
+
 
 class Bot(BaseBot):
     async def on_start(self, session_metadata: dict) -> None:
