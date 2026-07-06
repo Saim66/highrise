@@ -66,7 +66,7 @@ class Bot(BaseBot):
     async def on_tip(self, sender, receiver, tip):
         await self.cmd.on_tip(sender, receiver, tip)
 
-# --- UPDATED RUNNER ---
+# --- FINAL PROVEN FIX ---
 if __name__ == "__main__":
     token = os.getenv("BOT_TOKEN")
     room_id = os.getenv("ROOM_ID")
@@ -75,9 +75,6 @@ if __name__ == "__main__":
         logger.error("BOT_TOKEN or ROOM_ID not found in environment variables!")
         exit(1)
         
-    # Attempting a different initialization format
-    definitions = [BotDefinition(Bot(), room_id)] 
-    
-    # If the above fails, try: definitions = [BotDefinition(Bot(), room_id, token)]
-    
-    run(definitions, token)
+    # The SDK specifically requires: BotDefinition(bot_instance, room_id, api_token)
+    bot_def = BotDefinition(Bot(), room_id, token)
+    run([bot_def])
