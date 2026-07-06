@@ -1,14 +1,19 @@
 import os
+from highrise import BaseBot, BotDefinition
 from highrise.__main__ import main
-import sys
+
+# Your bot class
+class Bot(BaseBot):
+    async def on_start(self, session_metadata: dict) -> None:
+        print("Bot is successfully connected!")
 
 if __name__ == "__main__":
-    # We feed the arguments as if they were typed into the terminal
+    # Get your credentials
     token = os.getenv("BOT_TOKEN")
     room_id = os.getenv("ROOM_ID")
     
-    # We are manually setting the arguments the SDK expects
-    sys.argv = ["highrise", "main:Bot", room_id, token]
+    # Create the definition object required by the latest SDK
+    bot_def = BotDefinition(Bot(), room_id, token)
     
-    # This calls the internal SDK entry point directly
-    main()
+    # Pass the list of definitions to main
+    main([bot_def])
