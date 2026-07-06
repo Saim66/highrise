@@ -1,1 +1,0 @@
-web: highrise main:Bot $ROOM_ID $BOT_TOKEN
