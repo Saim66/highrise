@@ -10,3 +10,4 @@ if __name__ == "__main__":
     token = os.getenv("BOT_TOKEN")
     room_id = os.getenv("ROOM_ID")
     run(Bot(), room_id, token)
+    
