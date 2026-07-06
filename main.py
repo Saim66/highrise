@@ -1,13 +1,13 @@
 import os
 import asyncio
 import logging
-from highrise import Position, User, CurrencyItem, Item  #
 from highrise import BaseBot, Position, User
+from highrise.__main__ import run
+from highrise.models import BotDefinition
 from commands import CommandHandler
-from typing import Union
 from emotes import EMOTE_LIST
 
-# Configure logging for Railway/Render
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -16,17 +16,14 @@ class Bot(BaseBot):
         super().__init__()
         self.cmd = CommandHandler(self)
         self.data_cache = self.cmd.load_data()
-        self._api_lock = asyncio.Semaphore(1) 
-        self.dancing_users = set()
+        self._api_lock = asyncio.Semaphore(1)
 
     async def on_start(self, session_metadata):
         self.bot_id = session_metadata.user_id
-        self.cmd = CommandHandler(self)
         logger.info(f"✅ Bot Online in: {session_metadata.room_info.room_name}")
         asyncio.create_task(self.emote_engine())
 
     async def safe_api_call(self, coro):
-        """Prevents API flooding and handles disconnects silently."""
         async with self._api_lock:
             try:
                 return await coro
@@ -44,30 +41,21 @@ class Bot(BaseBot):
 
     async def on_chat(self, user: User, message: str) -> None:
         await self.cmd.execute(user, message)
-        # Refresh cache after potential command-based changes
         self.data_cache = self.cmd.load_data()
 
     async def on_user_join(self, user: User, position: Position):
-        # Allow room to stabilize
         await asyncio.sleep(2)
-       
         try:
-            # 1. Ban Check
             if user.id in self.data_cache.get("restricted", []):
                 await self.safe_api_call(self.highrise.teleport(user.id, Position(0, 0, 0, "FrontLeft")))
                 return
-
-            # 2. VIP Check
             if user.id in self.data_cache.get("vips", []):
                 await self.safe_api_call(self.highrise.chat(f"Welcome back, VIP @{user.username}!"))
                 return
-
-            # 3. Custom Welcome
             welcomes = self.data_cache.get("welcomes", {})
             msg = welcomes.get(user.username.lower())
             if msg:
                 await self.safe_api_call(self.highrise.chat(f"@{user.username}, {msg}"))
-           
         except Exception as e:
             logger.error(f"Join logic error: {e}")
 
@@ -75,6 +63,18 @@ class Bot(BaseBot):
         if hasattr(self.cmd, 'looping_users'):
             self.cmd.looping_users.pop(user.id, None)
 
-
     async def on_tip(self, sender, receiver, tip):
-        await self.cmd.on_tip(sender, receiver, tip) 
+        await self.cmd.on_tip(sender, receiver, tip)
+
+# --- CRITICAL FIX: The Runner ---
+if __name__ == "__main__":
+    # Ensure these environment variables are set in Railway -> Settings -> Variables
+    token = os.getenv("BOT_TOKEN")
+    room_id = os.getenv("ROOM_ID")
+    
+    if not token or not room_id:
+        logger.error("BOT_TOKEN or ROOM_ID not found in environment variables!")
+        exit(1)
+        
+    definitions = [BotDefinition(Bot(), room_id, token)]
+    run(definitions)
